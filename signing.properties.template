@@ -1,0 +1,6 @@
+# 签名配置模板（请复制为 signing.properties 并填入你的实际值）
+# 注意：请勿将包含真实密码的 signing.properties 上传到公共仓库
+storeFile=release.keystore
+storePassword=你的密码
+keyAlias=probe
+keyPassword=你的密码

@@ -1,0 +1,80 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.probe.rtspplayer'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "com.probe.rtspplayer"
+        minSdk 29 // Android 10+
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+    }
+
+    // 自动检测 signing.properties：存在则配置 release 签名
+    def signingPropsFile = rootProject.file('signing.properties')
+    if (signingPropsFile.exists()) {
+        println "[Signing] signing.properties detected, enabling release signing"
+        def props = new Properties()
+        props.load(new FileInputStream(signingPropsFile))
+        android {
+            signingConfigs {
+                release {
+                    storeFile file(props['storeFile'])
+                    storePassword props['storePassword']
+                    keyAlias props['keyAlias']
+                    keyPassword props['keyPassword']
+                }
+            }
+        }
+    } else {
+        println "[Signing] signing.properties not found, release will be unsigned"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (signingPropsFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+        debug {
+            // Debug 构建默认使用 debug keystore
+        }
+    }
+
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.5.9'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation platform('androidx.compose:compose-bom:2024.12.01')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    implementation 'androidx.activity:activity-compose:1.8.2'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.2'
+    implementation 'androidx.core:core-ktx:1.12.0'
+
+    implementation 'com.google.android.exoplayer:exoplayer:2.19.1'
+    implementation 'com.google.android.exoplayer:extension-rtsp:2.19.1'
+}
